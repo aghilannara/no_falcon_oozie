@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workflow-app xmlns="uri:oozie:workflow:0.3" name="FALCON_PROCESS_DEFAULT_prod-SIEBELNOVA-SIEBEL-CXTMGENERAL-data-retention-hdfs">
+    <start to="user-action"/>
+    <action name="user-action">
+        <sub-workflow>
+            <app-path>${nameNode}/user/trace/workflows/data-retention-hdfs</app-path>
+            <propagate-configuration/>
+        </sub-workflow>
+        <ok to="succeeded-post-processing"/>
+        <error to="failed-post-processing"/>
+    </action>
+    <action name="succeeded-post-processing" retry-max="3" retry-interval="1">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+                <property>
+                    <name>oozie.launcher.mapred.job.priority</name>
+                    <value>${jobPriority}</value>
+                </property>
+                <property>
+                    <name>oozie.launcher.oozie.libpath</name>
+                    <value>${wf:conf(&quot;falcon.libpath&quot;)}</value>
+                </property>
+            </configuration>
+            <main-class>org.apache.falcon.workflow.FalconPostProcessing</main-class>
+            <arg>-cluster</arg>
+            <arg>${cluster}</arg>
+            <arg>-entityType</arg>
+            <arg>${entityType}</arg>
+            <arg>-entityName</arg>
+            <arg>${entityName}</arg>
+            <arg>-nominalTime</arg>
+            <arg>${nominalTime}</arg>
+            <arg>-operation</arg>
+            <arg>${falconDataOperation}</arg>
+            <arg>-workflowId</arg>
+            <arg>${wf:id()}</arg>
+            <arg>-runId</arg>
+            <arg>${wf:run()}</arg>
+            <arg>-status</arg>
+            <arg>${wf:lastErrorNode() == null ? 'SUCCEEDED' : 'FAILED'}</arg>
+            <arg>-timeStamp</arg>
+            <arg>${timeStamp}</arg>
+            <arg>-brokerImplClass</arg>
+            <arg>${brokerImplClass}</arg>
+            <arg>-brokerUrl</arg>
+            <arg>${brokerUrl}</arg>
+            <arg>-userBrokerImplClass</arg>
+            <arg>${userBrokerImplClass}</arg>
+            <arg>-userBrokerUrl</arg>
+            <arg>${userBrokerUrl}</arg>
+            <arg>-userJMSNotificationEnabled</arg>
+            <arg>${userJMSNotificationEnabled}</arg>
+            <arg>-systemJMSNotificationEnabled</arg>
+            <arg>${systemJMSNotificationEnabled}</arg>
+            <arg>-brokerTTL</arg>
+            <arg>${brokerTTL}</arg>
+            <arg>-feedNames</arg>
+            <arg>${feedNames}</arg>
+            <arg>-feedInstancePaths</arg>
+            <arg>${feedInstancePaths}</arg>
+            <arg>-logFile</arg>
+            <arg>${logDir}/job-${nominalTime}/${wf:run()}/evicted-instancePaths.csv</arg>
+            <arg>-workflowEngineUrl</arg>
+            <arg>${workflowEngineUrl}</arg>
+            <arg>-subflowId</arg>
+            <arg>${wf:id()}${userWorkflowEngine == &quot;oozie&quot; ? &quot;@user-action&quot; : &quot;&quot;}</arg>
+            <arg>-userWorkflowEngine</arg>
+            <arg>${userWorkflowEngine}</arg>
+            <arg>-userWorkflowName</arg>
+            <arg>${userWorkflowName}</arg>
+            <arg>-userWorkflowVersion</arg>
+            <arg>${userWorkflowVersion}</arg>
+            <arg>-logDir</arg>
+            <arg>${logDir}/job-${nominalTime}/${srcClusterName == 'NA' ? '' : srcClusterName}/</arg>
+            <arg>-workflowUser</arg>
+            <arg>${wf:user()}</arg>
+            <arg>-falconInputFeeds</arg>
+            <arg>${falconInputFeeds}</arg>
+            <arg>-falconInPaths</arg>
+            <arg>${falconInPaths}</arg>
+            <arg>-datasource</arg>
+            <arg>${datasource == 'NA' ? 'IGNORE' : datasource}</arg>
+        </java>
+        <ok to="end"/>
+        <error to="fail"/>
+    </action>
+    <action name="failed-post-processing" retry-max="3" retry-interval="1">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+                <property>
+                    <name>oozie.launcher.mapred.job.priority</name>
+                    <value>${jobPriority}</value>
+                </property>
+                <property>
+                    <name>oozie.launcher.oozie.libpath</name>
+                    <value>${wf:conf(&quot;falcon.libpath&quot;)}</value>
+                </property>
+            </configuration>
+            <main-class>org.apache.falcon.workflow.FalconPostProcessing</main-class>
+            <arg>-cluster</arg>
+            <arg>${cluster}</arg>
+            <arg>-entityType</arg>
+            <arg>${entityType}</arg>
+            <arg>-entityName</arg>
+            <arg>${entityName}</arg>
+            <arg>-nominalTime</arg>
+            <arg>${nominalTime}</arg>
+            <arg>-operation</arg>
+            <arg>${falconDataOperation}</arg>
+            <arg>-workflowId</arg>
+            <arg>${wf:id()}</arg>
+            <arg>-runId</arg>
+            <arg>${wf:run()}</arg>
+            <arg>-status</arg>
+            <arg>${wf:lastErrorNode() == null ? 'SUCCEEDED' : 'FAILED'}</arg>
+            <arg>-timeStamp</arg>
+            <arg>${timeStamp}</arg>
+            <arg>-brokerImplClass</arg>
+            <arg>${brokerImplClass}</arg>
+            <arg>-brokerUrl</arg>
+            <arg>${brokerUrl}</arg>
+            <arg>-userBrokerImplClass</arg>
+            <arg>${userBrokerImplClass}</arg>
+            <arg>-userBrokerUrl</arg>
+            <arg>${userBrokerUrl}</arg>
+            <arg>-userJMSNotificationEnabled</arg>
+            <arg>${userJMSNotificationEnabled}</arg>
+            <arg>-systemJMSNotificationEnabled</arg>
+            <arg>${systemJMSNotificationEnabled}</arg>
+            <arg>-brokerTTL</arg>
+            <arg>${brokerTTL}</arg>
+            <arg>-feedNames</arg>
+            <arg>${feedNames}</arg>
+            <arg>-feedInstancePaths</arg>
+            <arg>${feedInstancePaths}</arg>
+            <arg>-logFile</arg>
+            <arg>${logDir}/job-${nominalTime}/${wf:run()}/evicted-instancePaths.csv</arg>
+            <arg>-workflowEngineUrl</arg>
+            <arg>${workflowEngineUrl}</arg>
+            <arg>-subflowId</arg>
+            <arg>${wf:id()}${userWorkflowEngine == &quot;oozie&quot; ? &quot;@user-action&quot; : &quot;&quot;}</arg>
+            <arg>-userWorkflowEngine</arg>
+            <arg>${userWorkflowEngine}</arg>
+            <arg>-userWorkflowName</arg>
+            <arg>${userWorkflowName}</arg>
+            <arg>-userWorkflowVersion</arg>
+            <arg>${userWorkflowVersion}</arg>
+            <arg>-logDir</arg>
+            <arg>${logDir}/job-${nominalTime}/${srcClusterName == 'NA' ? '' : srcClusterName}/</arg>
+            <arg>-workflowUser</arg>
+            <arg>${wf:user()}</arg>
+            <arg>-falconInputFeeds</arg>
+            <arg>${falconInputFeeds}</arg>
+            <arg>-falconInPaths</arg>
+            <arg>${falconInPaths}</arg>
+            <arg>-datasource</arg>
+            <arg>${datasource == 'NA' ? 'IGNORE' : datasource}</arg>
+        </java>
+        <ok to="fail"/>
+        <error to="fail"/>
+    </action>
+    <kill name="fail">
+        <message>Workflow failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>

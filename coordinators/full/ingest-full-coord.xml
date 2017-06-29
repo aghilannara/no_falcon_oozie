@@ -1,0 +1,53 @@
+<coordinator-app name="coord-${targetdb}-${schema}-${table}-ingest-full" frequency="${coord:days(1)}" start="${ingeststartTime}" end="${ingestendTime}" timezone="GMT+08:00" xmlns="uri:oozie:coordinator:0.5">
+	<controls>
+        	<timeout>8640</timeout>
+       	 	<concurrency>1</concurrency>
+        	<execution>FIFO</execution>
+        	<throttle>12</throttle>
+    	</controls>
+    	<datasets>
+         <dataset name="output0" frequency="${coord:days(1)}" initial-instance="${initialinstanceTime}" timezone="GMT+08:00">
+            	<uri-template>${nameNode}/${prefix}/source/${targetdb}/${schema}_${table}/CURRENT</uri-template>
+            	<done-flag>_SUCCESS</done-flag>
+         </dataset>
+         <dataset name="output0stats" frequency="${coord:days(1)}" initial-instance="${initialinstanceTime}" timezone="GMT+08:00">
+            	<uri-template>${nameNode}</uri-template>
+            	<done-flag>_SUCCESS</done-flag>
+         </dataset>
+    	</datasets>
+    	<output-events>
+         <data-out name="output0" dataset="output0">
+            	<instance>${today(8,0)}</instance>
+         </data-out>
+         <data-out name="output0stats" dataset="output0stats">
+            	<instance>${today(8,0)}</instance>
+         </data-out>
+    </output-events>
+	<action>
+		<workflow>
+			<app-path>${prefix}/workflows/ingest-full/workflow.xml</app-path>
+			<configuration>
+				<property>
+					<name>resourceManager</name>
+					<value>${resourceManager}</value>
+				</property>
+				<property>
+					<name>jobTracker</name>
+					<value>${jobTracker}</value>
+				</property>
+                                <property>
+                                        <name>nameNode</name>
+                                        <value>${nameNode}</value>
+                                </property>
+                                <property>
+                                        <name>oozie.wf.application.path</name>
+                                        <value>${prefix}/workflows/ingest-full</value>
+                                </property>
+				<property>
+                                       <name>appName</name>
+                                        <value>ingest-full-${targetdb}-${schema}-${table}</value>
+                                </property>
+			</configuration>
+		</workflow>
+	</action>
+</coordinator-app>

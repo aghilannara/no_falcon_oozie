@@ -1,0 +1,43 @@
+<coordinator-app name="coord-${targetdb}-${schema}-${table}-transform-increment" frequency="${coord:days(1)}" start="${transformstartTime}" end="${transformendTime}" timezone="GMT+08:00" xmlns="uri:oozie:coordinator:0.5">
+	<controls>
+        	<timeout>8640</timeout>
+        	<concurrency>1</concurrency>
+        	<execution>FIFO</execution>
+        	<throttle>12</throttle>
+    	</controls>
+    	<datasets>
+         <dataset name="input0" frequency="${coord:days(1)}" initial-instance="${initialinstanceTime}" timezone="GMT+08:00">
+            <uri-template>${nameNode}/${prefix}/source/${targetdb}/${schema}_${table}/CURRENT</uri-template>
+            <done-flag>_SUCCESS</done-flag>
+         </dataset>
+    	</datasets>
+    	<input-events>
+         <data-in name="input0" dataset="input0">
+            	<start-instance>${today(8,0)}</start-instance>
+            	<end-instance>${today(9,30)}</end-instance>
+         </data-in>
+    	</input-events>
+	<action>
+		<workflow>
+			<app-path>${prefix}/workflows/transform-increment/workflow.xml</app-path>
+			<configuration>
+				<property>
+					<name>resourceManager</name>
+					<value>${resourceManager}</value>
+				</property>
+				<property>
+					<name>jobTracker</name>
+					<value>${jobTracker}</value>
+				</property>
+                                <property>
+                                        <name>nameNode</name>
+                                        <value>${nameNode}</value>
+                                </property>
+                                <property>
+                                        <name>oozie.wf.application.path</name>
+                                        <value>${prefix}/workflows/transform-increment</value>
+                                </property>
+			</configuration>
+		</workflow>
+	</action>
+</coordinator-app>

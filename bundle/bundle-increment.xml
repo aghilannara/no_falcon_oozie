@@ -1,0 +1,14 @@
+<bundle-app xmlns="uri:oozie:bundle:0.2" name="bundle-increment-${targetdb}-${schema}-${table}">
+	<coordinator name="coord-${targetdb}-${schema}-${table}-ingest-increment">
+		<app-path>${nameNode}${prefix}/workflows/coordinators/ingest-increment-coord.xml</app-path>
+		<configuration>
+			<property>
+				<name>user.name</name>
+				<value>trace</value>
+			</property>
+		</configuration>
+	</coordinator>
+	<coordinator name="coord-${targetdb}-${schema}-${table}-transform-increment">
+		<app-path>${nameNode}${prefix}/workflows/coordinators/transform-increment-coord.xml</app-path>
+	</coordinator>
+</bundle-app>
